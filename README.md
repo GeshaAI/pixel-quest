@@ -1,7 +1,7 @@
 # pixel-quest
 Pixel Quest — A free retro 2D platformer inspired by classic 8-bit games. Built with HTML5, JavaScript and Canvas for Android and desktop browsers.
 
-## Browser release v0.6.0
+## Browser release v0.7.0
 Play: https://geshaai.github.io/pixel-quest/
 
 Two playable levels: Emerald Hills and Dusk Trail. Original Canvas graphics and synthesized sound;
@@ -20,7 +20,7 @@ Touch: left/right and run/jump can be held simultaneously.
 Run checks: `node tests/game.cjs` (Node 18+; no package installation).
 These use the real game logic with a stub DOM/Canvas. The traversal test disables
 enemies to isolate terrain clearance. They do not measure rendering, audio playback,
-actual Android touch input or FPS. v0.6.0 graphics still need a real tablet playtest. The user confirmed both v0.4.1 levels are playable on their tablet.
+actual Android touch input or FPS. v0.7.0 graphics still need a real tablet playtest. The user confirmed both v0.4.1 levels are playable on their tablet.
 
 ### Audit and remaining scope
 The existing v0.4 second level was retained while integrating the core fixes. Fixed floating enemies, incomplete
@@ -46,3 +46,15 @@ mountains, clouds with shadows, mist and small ambient motes. Four soil texture
 variants per palette, mossy platforms, flowers, mushrooms and rocks. Larger scout
 sprite, fluttering scarf, contact shadows and analytic running dust. All decorative
 assets are original Canvas artwork; physics and platform placement are unchanged.
+
+### v0.7.0 illustrated asset pass
+Two original generated day/dusk backgrounds, an eight-pose transparent scout
+atlas, and terrain/stone/crate/gem/beetle art are now bundled as local WebP assets.
+No runtime generation service or external image host is required. Artwork loads
+with the menu; missing/blocked images retain the earlier procedural art.
+The level selector can also start 1-2 for art review. Physics and saved progress
+formats are preserved.
+
+Asset provenance: original AI-generated game art produced with the built-in
+image-generation tool for this project; no Nintendo assets. Original-resolution
+outputs are packaged as WebP for delivery. See assets/ART.md for prompts.
