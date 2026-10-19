@@ -1,10 +1,10 @@
 # pixel-quest
 Pixel Quest — A free retro 2D platformer inspired by classic 8-bit games. Built with HTML5, JavaScript and Canvas for Android and desktop browsers.
 
-## Browser release v0.7.0
+## Browser release v0.8.0
 Play: https://geshaai.github.io/pixel-quest/
 
-Two playable levels: Emerald Hills and Dusk Trail. Original Canvas graphics and synthesized sound;
+Three playable levels: Emerald Hills, Dusk Trail and Crystal Caverns. Original Canvas graphics and synthesized sound;
 no dependencies, external assets, paid APIs or backend.
 
 - Walk/run, variable jump, coyote time, jump buffer, camera and multitouch.
@@ -20,7 +20,7 @@ Touch: left/right and run/jump can be held simultaneously.
 Run checks: `node tests/game.cjs` (Node 18+; no package installation).
 These use the real game logic with a stub DOM/Canvas. The traversal test disables
 enemies to isolate terrain clearance. They do not measure rendering, audio playback,
-actual Android touch input or FPS. v0.7.0 graphics still need a real tablet playtest. The user confirmed both v0.4.1 levels are playable on their tablet.
+actual Android touch input or FPS. v0.8.0 content still needs a real tablet playtest. The user confirmed both v0.4.1 levels are playable on their tablet.
 
 ### Audit and remaining scope
 The existing v0.4 second level was retained while integrating the core fixes. Fixed floating enemies, incomplete
@@ -58,3 +58,21 @@ formats are preserved.
 Asset provenance: original AI-generated game art produced with the built-in
 image-generation tool for this project; no Nintendo assets. Original-resolution
 outputs are packaged as WebP for delivery. See assets/ART.md for prompts.
+
+### v0.8.0 Crystal Caverns
+- Campaign transitions 1-1 → 1-2 → 1-3; direct level selection for all three.
+- Original crystal cavern background and four-pose bat artwork.
+- Three horizontal moving platforms: ride, jump off, and pass through from below.
+- Bats patrol bounded corridors, avoid stone/crate walls, and can be stomped.
+- An upper alcove near tile 66 leads to a separate secret room. Tap the existing
+  run button (⚡) or press E while near the doorway; use the same input to exit.
+- Eight gems and one extra life, with persistent loot state that prevents farming.
+- Continue from inside the room resumes safely in the main cavern with rewards.
+
+Validation: 33 Node checks, including input-driven traversal of the third level
+and of the complete secret-room route. Terrain route tests disable enemies; enemy
+flight, wall avoidance and stomps are checked separately. Physical Android FPS
+and full playthrough with enemies still require a tablet playtest.
+
+The fourth level and first boss are planned next; this is not a completed world
+or the full 32-level campaign. No APK work has started.

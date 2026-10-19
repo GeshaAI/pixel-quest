@@ -18,3 +18,17 @@ the atlases by Canvas; images remain separate from gameplay collision shapes.
 
 Direction: handcrafted detailed pixel art, turquoise shadow/amber light palette,
 crisp intentional clusters, original indie fantasy, no Nintendo elements.
+
+## v0.8.0 resources
+- crystal-cave.webp: original detailed pixel-art panorama, 2172×724; blue/violet
+  crystal cavern, underground river, stone arches, distant ruined bridge and amber
+  lanterns. Quiet lower band, side-on perspective; no foreground platforms,
+  characters, text or HUD. Produced with the built-in image generator.
+- bat-atlas.webp: original transparent 2×2 flight-pose atlas, 1254×1254. One same
+  violet bat with amber eyes, turquoise crystal forehead and teal/violet wings;
+  raised/spread/down/half-raised wing poses, no captions or scene. Generated with
+  the built-in image generator; sampled by explicit source rectangles.
+
+The images retain their original resolution and transparency and are encoded
+as WebP for browser delivery. Prompts requested the approved detailed fantasy
+pixel-art direction, cool indigo shadows, cyan light and restrained amber highlights.
