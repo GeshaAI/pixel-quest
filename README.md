@@ -81,3 +81,12 @@ or the full 32-level campaign. An Android offline testing package is now availab
 The Android APK workflow packages the current game offline using a small native
 WebView activity. Source and build instructions: [android/README.md](android/README.md).
 The browser game is retained. Android and browser saves are independent.
+
+
+## v0.9.0 — Treetop Tower
+
+Fourth playable level: vertical forest tower, one-way wooden decks, a vertical lift, climbable ropes and a swinging vine. Select **PLAY 1-4 · TREETOP TOWER**. Use W/S or the new ↑/↓ touch buttons to climb; Space / jump to release; E / ⚡ to grab or release a nearby vine; left/right to pump it. The checkpoint now saves height as well as horizontal position. Older level saves remain supported. Retry restarts the current level.
+
+The optional reward alcove is part of the tower, not a separate room. Springs and collapsing platforms are future work. Original approved forest/hero assets are retained.
+
+Validation: 43 Node VM regression checks, including an input-driven traversal of the tower without teleporting (enemies disabled to isolate route geometry). Real Samsung tablet performance and touch playability still require user testing. See [Russian development brief](docs/TREETOP_TOWER_BRIEF_RU.md).

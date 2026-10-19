@@ -26,12 +26,12 @@ find "$OUT/classes" -name '*.class' -print > "$OUT/classes.list"
 cp "$OUT/base.apk" "$OUT/unsigned.apk"
 (cd "$OUT/dex" && zip -q "$OUT/unsigned.apk" classes.dex)
 "$BUILD_TOOLS/zipalign" -f 4 "$OUT/unsigned.apk" "$OUT/aligned.apk"
-APK="$OUT/dist/PixelQuest-v0.8.0-android.apk"
+APK="$OUT/dist/PixelQuest-v0.9.0-android.apk"
 # This is an intentionally public development certificate, not a production secret.
 "$BUILD_TOOLS/apksigner" sign --ks android/debug.keystore --ks-key-alias androiddebugkey \
     --ks-pass pass:android --key-pass pass:android --out "$APK" "$OUT/aligned.apk"
 "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK" | tee "$OUT/dist/signature.txt"
 "$BUILD_TOOLS/aapt2" dump badging "$APK" | tee "$OUT/dist/package.txt"
 python3 android/verify-apk.py "$APK"
-(cd "$OUT/dist" && sha256sum PixelQuest-v0.8.0-android.apk > SHA256SUMS.txt)
+(cd "$OUT/dist" && sha256sum PixelQuest-v0.9.0-android.apk > SHA256SUMS.txt)
 echo "APK ready: $APK"
