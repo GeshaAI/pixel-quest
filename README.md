@@ -75,4 +75,9 @@ flight, wall avoidance and stomps are checked separately. Physical Android FPS
 and full playthrough with enemies still require a tablet playtest.
 
 The fourth level and first boss are planned next; this is not a completed world
-or the full 32-level campaign. No APK work has started.
+or the full 32-level campaign. An Android offline testing package is now available; see android/README.md.
+
+### Android testing build
+The Android APK workflow packages the current game offline using a small native
+WebView activity. Source and build instructions: [android/README.md](android/README.md).
+The browser game is retained. Android and browser saves are independent.
