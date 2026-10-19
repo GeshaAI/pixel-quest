@@ -2,7 +2,7 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const script=fs.readFileSync('index.html','utf8').match(/<script>([\s\S]*)<\/script>/)[1];
 function harness(blocked=false){const nodes=new Map(),data=new Map();function node(k){if(!nodes.has(k))nodes.set(k,{style:{},textContent:'',addEventListener(){},querySelector:node,getContext:()=>new Proxy({},{get:()=>()=>{}})});return nodes.get(k)}
-const context=vm.createContext({console,Math,JSON,Number,Set,innerWidth:1280,innerHeight:800,devicePixelRatio:1,window:{},document:{querySelector:node,querySelectorAll:()=>[],addEventListener(){}},addEventListener(){},requestAnimationFrame(){},localStorage:{getItem(k){if(blocked)throw Error('denied');return data.get(k)||null},setItem(k,v){if(blocked)throw Error('denied');data.set(k,String(v))},removeItem(k){if(blocked)throw Error('denied');data.delete(k)}}});
+const context=vm.createContext({console,Math,JSON,Number,Set,innerWidth:1280,innerHeight:800,devicePixelRatio:1,window:{},document:{createElement:()=>({width:0,height:0,getContext:()=>new Proxy({},{get:()=>()=>{}})}),querySelector:node,querySelectorAll:()=>[],addEventListener(){}},addEventListener(){},requestAnimationFrame(){},localStorage:{getItem(k){if(blocked)throw Error('denied');return data.get(k)||null},setItem(k,v){if(blocked)throw Error('denied');data.set(k,String(v))},removeItem(k){if(blocked)throw Error('denied');data.delete(k)}}});
 vm.runInContext(script.replace('})();',"globalThis.inspect=code=>eval(code);})();"),context);return {run:context.inspect,data}}
 let passed=0;function test(name,fn){fn();passed++;console.log('PASS',name)}
 let h=harness(),run=h.run;
@@ -22,4 +22,5 @@ test('game over stops the physics loop immediately',()=>{run('begin();lives=1;pl
 test('full level traversable using running jumps',()=>{run('begin();keys.run=keys.right=true;enemies.forEach(e=>e.alive=false)');for(let i=0;i<4000&&run('state')==='play';i++){run(`setKey('jump',true);if(player.onGround&&[24*T,54*T,88*T].some(edge=>edge-player.x>20&&edge-player.x<55))jumpBuffer=.13;step(1/120)`)}assert.equal(run('state'),'between');assert.equal(run('level'),2);assert.ok(run('lives')>0)});
 test('second level terrain traversal',()=>{run('begin(false,2);keys.run=keys.right=true;enemies.forEach(e=>e.alive=false)');for(let i=0;i<4000&&run('state')==='play';i++)run("setKey('jump',true);if(player.onGround&&[19*T,43*T,70*T,101*T].some(edge=>edge-player.x>20&&edge-player.x<55))jumpBuffer=.13;step(1/120)");assert.equal(run('state'),'won')});
 test('second level persists on continue',()=>{run('begin(false,2);save();begin(true)');assert.equal(run('level'),2);assert.equal(run('crates.length'),5)});
+test('both art themes render through Canvas API',()=>{run('begin();draw();begin(false,2);draw()');assert.ok(run('sprites.size')>=8)});
 console.log(`${passed} tests passed`);
