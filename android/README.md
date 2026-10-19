@@ -11,7 +11,7 @@ The Android WebView component supplies Canvas and Web Audio. No paid APIs or
 external services are required by the installed game.
 
 ## Build
-Run `bash android/build-apk.sh` with JDK 17, Node, Android SDK platform 35 and
+Run `bash android/build-apk.sh` with JDK 21, Node, Android SDK platform 35 and
 build-tools 35.0.0. GitHub Actions → Android APK builds automatically on changes
 and can be run manually. The workflow uploads the APK, SHA256SUMS.txt, package
 metadata and certificate verification.
