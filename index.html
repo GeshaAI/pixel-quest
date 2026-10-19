@@ -7,41 +7,41 @@
 const c=document.querySelector('#game'),ctx=c.getContext('2d'),hud=document.querySelector('#hud'),overlay=document.querySelector('#overlay'),start=document.querySelector('#start'),cont=document.querySelector('#continue');
 const W=480,H=270,T=24,worldW=130*T;let scale=1,cam=0,state='menu',score=0,coins=0,lives=3,tick=0,checkpoint=2*T;
 const keys={left:false,right:false,jump:false,run:false};let jumpBuffer=0,coyote=0,wasJump=false;
-let solids=[],gems=[],enemies=[],particles=[],flags=[],player;
+let solids=[],gems=[],enemies=[],particles=[],flags=[],player;let crates=[],powerups=[];
 function resize(){c.width=Math.max(1,innerWidth*devicePixelRatio);c.height=Math.max(1,innerHeight*devicePixelRatio);scale=Math.min(c.width/W,c.height/H);ctx.imageSmoothingEnabled=false}addEventListener('resize',resize);resize();
 function block(x,y,w=1,h=1,type='earth'){solids.push({x:x*T,y:y*T,w:w*T,h:h*T,type})}
-function build(){solids=[];gems=[];enemies=[];particles=[];flags=[];for(let x=0;x<130;x++){if((x>=24&&x<=27)||(x>=54&&x<=57)||(x>=88&&x<=91))continue;block(x,10,1,3)}[[8,7,4],[18,6,4],[31,7,5],[44,6,4],[61,7,5],[76,6,5],[96,7,5],[112,6,5]].forEach(([x,y,w])=>block(x,y,w,1,'brick'));[5,7,9,12,15,20,22,30,33,36,40,45,48,52,60,64,69,73,78,82,86,95,99,104,109,115,120,124].forEach((x,i)=>gems.push({x:x*T+8,y:(i%3===0?6:8)*T,got:false}));[14,34,46,68,80,100,116].forEach((x,i)=>enemies.push({x:x*T,y:9*T-17,w:19,h:17,vx:i%2?35:-35,alive:true}));flags=[{x:127*T,y:6*T}];checkpoint=2*T;player={x:checkpoint,y:6*T,w:17,h:22,vx:0,vy:0,onGround:false,inv:0};cam=0;tick=0}
+function build(){solids=[];gems=[];enemies=[];particles=[];flags=[];crates=[];powerups=[];for(let x=0;x<130;x++){if((x>=24&&x<=27)||(x>=54&&x<=57)||(x>=88&&x<=91))continue;block(x,10,1,3)}[[8,7,4],[18,6,4],[31,7,5],[44,6,4],[61,7,5],[76,6,5],[96,7,5],[112,6,5]].forEach(([x,y,w])=>block(x,y,w,1,'brick'));[5,7,9,12,15,20,22,30,33,36,40,45,48,52,60,64,69,73,78,82,86,95,99,104,109,115,120,124].forEach((x,i)=>gems.push({x:x*T+8,y:(i%3===0?6:8)*T,got:false}));[14,34,46,68,80,100,116].forEach((x,i)=>enemies.push({x:x*T,y:9*T-17,w:19,h:17,vx:i%2?35:-35,alive:true}));crates=[{x:16*T,y:7*T,used:false},{x:41*T,y:6*T,used:false},{x:72*T,y:6*T,used:false},{x:110*T,y:6*T,used:false}];powerups=[{x:38*T,y:8*T,type:'heart',got:false},{x:84*T,y:8*T,type:'speed',got:false}];flags=[{x:127*T,y:6*T}];checkpoint=2*T;player={x:checkpoint,y:6*T,w:17,h:22,vx:0,vy:0,onGround:false,inv:0,boost:0};cam=0;tick=0}
 function intersects(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
-function collide(axis){for(const b of solids){if(!intersects(player,b))continue;if(axis==='x'){if(player.vx>0)player.x=b.x-player.w;else if(player.vx<0)player.x=b.x+b.w;player.vx=0}else{if(player.vy>0){player.y=b.y-player.h;player.onGround=true}else if(player.vy<0)player.y=b.y+b.h;player.vy=0}}}
+function collide(axis){for(const q of crates){if(q.used||!intersects(player,{x:q.x,y:q.y,w:T,h:T}))continue;if(axis==='y'&&player.vy<0&&player.y<q.y+T){q.used=true;player.y=q.y+T;player.vy=0;score+=50;gems.push({x:q.x+8,y:q.y-24,got:false});for(let i=0;i<8;i++)particles.push({x:q.x+12,y:q.y+12,vx:(Math.random()-.5)*120,vy:-Math.random()*130,life:.6})}}for(const b of solids){if(!intersects(player,b))continue;if(axis==='x'){if(player.vx>0)player.x=b.x-player.w;else if(player.vx<0)player.x=b.x+b.w;player.vx=0}else{if(player.vy>0){player.y=b.y-player.h;player.onGround=true}else if(player.vy<0)player.y=b.y+b.h;player.vy=0}}}
 function hurt(){if(player.inv>0)return;lives--;if(lives<=0){state='lost';show('GAME OVER','RETRY');return}player.x=checkpoint;player.y=5*T;player.vx=player.vy=0;player.inv=1.5}
 function show(title,button){overlay.style.display='flex';overlay.querySelector('h1').textContent=title;start.textContent=button;cont.style.display='none'}
 function begin(resume=false){build();score=resume?Number(localStorage.getItem('pq_score')||0):0;coins=resume?Number(localStorage.getItem('pq_coins')||0):0;lives=3;state='play';overlay.style.display='none'}
-start.onclick=()=>begin(false);cont.onclick=()=>begin(true);cont.style.display=localStorage.getItem('pq_unlocked')?'block':'none';
+start.onclick=()=>{if(state==='paused'){state='play';overlay.style.display='none'}else begin(false)};cont.onclick=()=>begin(true);cont.style.display=localStorage.getItem('pq_unlocked')?'block':'none';
 function setKey(k,v){if(k==='jump'&&v&&!keys.jump)jumpBuffer=.13;keys[k]=v}
 document.querySelectorAll('[data-key]').forEach(b=>{const k=b.dataset.key;b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);setKey(k,true)});for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>setKey(k,false))});
 const map={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',Space:'jump',ArrowUp:'jump',KeyW:'jump',ShiftLeft:'run',ShiftRight:'run'};
 addEventListener('keydown',e=>{if(map[e.code]){e.preventDefault();setKey(map[e.code],true)}if(e.code==='KeyP'&&!e.repeat)pause()});addEventListener('keyup',e=>{if(map[e.code]){e.preventDefault();setKey(map[e.code],false)}});addEventListener('blur',()=>{Object.keys(keys).forEach(k=>keys[k]=false);if(state==='play')pause()});
 function pause(){if(state==='play'){state='paused';show('PAUSED','RESUME')}else if(state==='paused'){state='play';overlay.style.display='none'}}
-document.querySelector('#pause').onclick=pause;start.addEventListener('click',()=>{if(state==='paused'){state='play';overlay.style.display='none'}});
-function step(dt){tick+=dt;player.inv=Math.max(0,player.inv-dt);jumpBuffer=Math.max(0,jumpBuffer-dt);coyote=player.onGround?.095:Math.max(0,coyote-dt);
-const dir=(keys.right?1:0)-(keys.left?1:0),speed=keys.run?190:135,acc=player.onGround?1100:700;player.vx+=Math.max(-acc*dt,Math.min(acc*dt,dir*speed-player.vx));if(!dir)player.vx*=Math.max(0,1-(player.onGround?12:3)*dt);
+document.querySelector('#pause').onclick=pause;
+function step(dt){tick+=dt;player.inv=Math.max(0,player.inv-dt);player.boost=Math.max(0,player.boost-dt);jumpBuffer=Math.max(0,jumpBuffer-dt);coyote=player.onGround?.095:Math.max(0,coyote-dt);
+const dir=(keys.right?1:0)-(keys.left?1:0),speed=player.boost>0?240:(keys.run?190:135),acc=player.onGround?1100:700;player.vx+=Math.max(-acc*dt,Math.min(acc*dt,dir*speed-player.vx));if(!dir)player.vx*=Math.max(0,1-(player.onGround?12:3)*dt);
 if(jumpBuffer>0&&coyote>0){player.vy=-305;player.onGround=false;coyote=0;jumpBuffer=0}
 if(!keys.jump&&player.vy<0)player.vy+=1100*dt;
 player.vy=Math.min(520,player.vy+850*dt);player.x+=player.vx*dt;collide('x');player.y+=player.vy*dt;player.onGround=false;collide('y');player.x=Math.max(0,Math.min(worldW-player.w,player.x));
-if(player.y>H+140)hurt();
-for(const g of gems){if(!g.got&&Math.abs(player.x-g.x)<19&&Math.abs(player.y-g.y)<23){g.got=true;coins++;score+=100;for(let i=0;i<7;i++)particles.push({x:g.x,y:g.y,vx:(Math.random()-.5)*100,vy:-Math.random()*100,life:.5})}}
+if(player.y>H+140){hurt();if(state!=='play')return}
+for(const p of powerups){if(!p.got&&Math.abs(player.x-p.x)<20&&Math.abs(player.y-p.y)<24){p.got=true;if(p.type==='heart')lives=Math.min(5,lives+1);else player.boost=10;score+=250}}for(const g of gems){if(!g.got&&Math.abs(player.x-g.x)<19&&Math.abs(player.y-g.y)<23){g.got=true;coins++;score+=100;for(let i=0;i<7;i++)particles.push({x:g.x,y:g.y,vx:(Math.random()-.5)*100,vy:-Math.random()*100,life:.5})}}
 for(const e of enemies){if(!e.alive)continue;e.x+=e.vx*dt;const probe={x:e.vx>0?e.x+e.w+1:e.x-2,y:e.y+e.h+2,w:2,h:3};if(solids.some(b=>intersects(e,b))||!solids.some(b=>intersects(probe,b))){e.x-=e.vx*dt;e.vx=-e.vx}if(intersects(player,e)){if(player.vy>40&&player.y+player.h-e.y<15){e.alive=false;player.vy=-220;score+=200}else hurt()}}
 for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=200*dt;p.life-=dt}particles=particles.filter(p=>p.life>0);
 if(player.x>63*T)checkpoint=60*T;if(player.x>105*T)checkpoint=95*T;
-if(player.x>flags[0].x-10){state='won';localStorage.setItem('pq_unlocked','1');localStorage.setItem('pq_score',score);localStorage.setItem('pq_coins',coins);show('LEVEL COMPLETE!','PLAY AGAIN')}
-cam+=((Math.max(0,Math.min(worldW-W,player.x-W*.38)))-cam)*Math.min(1,dt*7);hud.textContent='★ '+score+'   ◆ '+coins+'   ♥ '+lives+'   1-1'}
+if(state==='play'&&player.x>flags[0].x-10){state='won';localStorage.setItem('pq_unlocked','1');localStorage.setItem('pq_score',score);localStorage.setItem('pq_coins',coins);show('LEVEL COMPLETE!','PLAY AGAIN')}
+cam+=((Math.max(0,Math.min(worldW-W,player.x-W*.38)))-cam)*Math.min(1,dt*7);hud.textContent='★ '+score+'   ◆ '+coins+'   ♥ '+lives+'   1-1   v0.2'}
 function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.ceil(w),Math.ceil(h))}
 function draw(){ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#142137';ctx.fillRect(0,0,c.width,c.height);ctx.setTransform(scale,0,0,scale,(c.width-W*scale)/2,(c.height-H*scale)/2);
 rect(0,0,W,H,'#77c8ef');rect(0,190,W,80,'#b5e7f1');
 for(let i=0;i<12;i++){let x=((i*115-cam*.22)%(W+140)+(W+140))%(W+140)-70;rect(x,100+(i%3)*14,80,100,'#68bdb2');rect(x+16,78+(i%3)*14,50,28,'#68bdb2')}
 ctx.save();ctx.translate(-Math.round(cam),0);
 for(const b of solids){if(b.x+b.w<cam-30||b.x>cam+W+30)continue;rect(b.x,b.y,b.w,b.h,b.type==='brick'?'#b96b52':'#9b603f');rect(b.x,b.y,b.w,5,b.type==='brick'?'#e8b17d':'#69c35d');if(b.type==='brick')for(let x=b.x+12;x<b.x+b.w;x+=24)rect(x,b.y+12,2,10,'#713f44')}
-for(const g of gems){if(g.got||g.x<cam-20||g.x>cam+W+20)continue;let bob=Math.sin(tick*6+g.x)*3;rect(g.x+4,g.y+bob,10,14,'#ffde61');rect(g.x+7,g.y+3+bob,4,8,'#fff5b0')}
+for(const q of crates){if(q.x<cam-30||q.x>cam+W+30)continue;rect(q.x,q.y,T,T,q.used?'#786a71':'#e0a044');rect(q.x+5,q.y+5,14,14,q.used?'#968b88':'#ffda75');if(!q.used)rect(q.x+10,q.y+7,5,10,'#98613e')}for(const p of powerups){if(p.got||p.x<cam-30||p.x>cam+W+30)continue;rect(p.x,p.y,16,16,p.type==='heart'?'#e95474':'#5b80f5');rect(p.x+5,p.y+4,6,8,'#fff4c4')}for(const g of gems){if(g.got||g.x<cam-20||g.x>cam+W+20)continue;let bob=Math.sin(tick*6+g.x)*3;rect(g.x+4,g.y+bob,10,14,'#ffde61');rect(g.x+7,g.y+3+bob,4,8,'#fff5b0')}
 for(const e of enemies){if(!e.alive||e.x<cam-30||e.x>cam+W+30)continue;rect(e.x,e.y+5,19,12,'#a54879');rect(e.x+3,e.y,13,8,'#e2779a');rect(e.x+4,e.y+7,3,4,'#fff');rect(e.x+12,e.y+7,3,4,'#fff')}
 for(const f of flags){rect(f.x,f.y,4,96,'#eee4c7');rect(f.x+4,f.y,28,18,'#ffce4c');rect(f.x+11,f.y+4,12,8,'#b66b45')}
 if(!(player.inv>0&&Math.floor(tick*12)%2)){let x=player.x,y=player.y;rect(x+3,y,11,6,'#353d79');rect(x+1,y+5,15,9,'#f4bf8b');rect(x+3,y+14,12,8,'#2b5c83');rect(x+12,y+8,3,3,'#233344');rect(x+2,y+20,6,3,'#503b59');rect(x+10,y+20,6,3,'#503b59');rect(x+1,y+13,3,7,'#e5a05e')}
